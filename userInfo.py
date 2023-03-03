@@ -1,16 +1,33 @@
 import re
 import os
 import openai
-from dotenv import load_dotenv
+import requests
 import phonenumbers
+from dotenv import load_dotenv
 from phonenumbers import geocoder
 
 load_dotenv()
 openai.api_key = os.environ['API_KEY']
+SCAM_SEARCH_API_KEY = os.environ['SCAM_Search_API_KEY']
 
 def is_valid_email(email):
-    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    return re.match(pattern, email) is not None
+    pattern = re.compile('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+    if pattern.match(email):
+        # return True
+        url = "https://scamsearch.io/api/search? search=" + email + " &type=email &api_token=" + SCAM_SEARCH_API_KEY
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            results = response.json()
+            if results['status'] == True:
+                return False
+            else:
+                return True
+        else:
+            print(f"Error: {response.status_code}")
+    else:
+        return False
 
 def is_valid_phoneNo(phoneNo):
     pattern = re.compile("\+[1-9][0-9]{0,14}")
@@ -43,7 +60,7 @@ def is_valid_project(project):
 def does_country_match_phone_code(phoneNo, country):
     parsed_number = phonenumbers.parse(phoneNo)
     country_name = geocoder.country_name_for_number(parsed_number,'en')
-    if country_name.lower() == country:
+    if country_name.lower() == country.lower():
         return True
     else:
         return False

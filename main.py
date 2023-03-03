@@ -76,7 +76,9 @@ async def create_lead(request: Request, user_string_request: leadSchema):
     lead_dict['projectDetails'] = user_string_request.projectDetails
     message = validateUserInfo(lead_dict)
     print(message)
-    # leads_collection.insert_one(lead_dict)
+    if message == 'correct':
+        leads_collection.insert_one(lead_dict)
+
     return {"message": message}
 
 

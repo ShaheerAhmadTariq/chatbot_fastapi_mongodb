@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const CreateLead = () => {
@@ -7,7 +8,7 @@ const CreateLead = () => {
   const [phoneNo, setPhoneNo] = useState("");
   const [country, setCountry] = useState("");
   const [projectDetails, setProjectDetails] = useState("");
-
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -22,7 +23,9 @@ const CreateLead = () => {
       console.log(data.message);
       if (data.message != 'correct'){
         alert(data.message)
-      } 
+      }else{
+        navigate("/chatbot");
+      }
     } catch (error) {
       console.error(error);
     }
