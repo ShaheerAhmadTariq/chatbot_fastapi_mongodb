@@ -4,7 +4,8 @@ function WebSocketTest() {
   const [socket, setSocket] = useState(null);
   const [inputValue, setInputValue] = useState('');
   const [response, setResponse] = useState('');
-
+  const username = localStorage.getItem('name')
+  const useremail = localStorage.getItem('email')
   useEffect(() => {
     const ws = new WebSocket("ws://localhost:8000/chatbot");
 
@@ -35,7 +36,8 @@ function WebSocketTest() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const SendingData = JSON.stringify({ prompt: inputValue, email: 'shaheerahmadtariq@gmail.com' })
+    let useremail = localStorage.getItem('email')
+    const SendingData = JSON.stringify({ prompt: inputValue, email: useremail })
     socket.send(SendingData)
     var getValue= document.getElementById("name");
         if (getValue.value !="") {
@@ -47,7 +49,7 @@ function WebSocketTest() {
   }
   return (
     <div >
-      <ChatList leadName="shaheerahmadtariq@gmail.com" name = 'Shaheer' />
+      <ChatList leadName={useremail} name = {username} />
       {/* <h1 style={{ display: 'flex', justifyContent: 'center' }}>Chatbot</h1> */}
       <div style={{ position: 'fixed', bottom: 0, zIndex: 9999, width: '100%' ,backgroundColor: '#E5E4E2'}}>
         <form style={{ display: 'flex', justifyContent: 'center' ,padding: '10px'}} onSubmit={handleSubmit}>

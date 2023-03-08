@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useRouter } from 'next/router';
+import Cookies from 'cookies-next'
+
 function Login() {
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
 //   const [password, setPassword] = useState('');
-  const navigate = useNavigate();
+  const router = useRouter();
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
   }
-
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,14 +21,13 @@ function Login() {
     const data = await response.json();
     // console.log("the response :",response)
     if (data.message === "Success") {
-    console.log("Success")
-    localStorage.setItem("email", email)
-    localStorage.setItem("name", data.name)
-    // localStorage.setItem("user", JSON.stringify({
-    //   email: email,
-    //   name: data.name,
-    // }))
-    navigate("/chatbot");
+        setName(data.name);
+        console.log("Success")
+        localStorage.setItem("email", email)
+        localStorage.setItem("name", data.name)
+        
+       
+        router.push("/chatbot/Chatbot");
     }else{
         console.log("Error")
     }

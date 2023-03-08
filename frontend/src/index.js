@@ -5,6 +5,7 @@ import QA from "./components/QA";
 import Login from "./components/Login";
 import CreateLead from "./components/CreateLead";
 import WebSocketTest from "./components/WebSocketTest";
+import Country from "./components/Country";
 export default function App() {
   return (
     <BrowserRouter>
@@ -12,6 +13,7 @@ export default function App() {
         <Route path="/" element={<Login/>}></Route>
         <Route path="/createLead" element={<CreateLead/>}></Route>
         <Route path="/chatbot" element={<WebSocketTest/>}></Route>
+        <Route path="/addCountry" element={<Country/>}></Route>
       </Routes>
     </BrowserRouter>
   );

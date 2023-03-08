@@ -30,4 +30,13 @@ class Chats(BaseModel):
             "completion": self.completion,
             "lead_id": self.lead_id,
         }
+    
+class Countries(BaseModel):
+    def __init__(self, country: str):
+        self.country = country
 
+    def to_dict(self):
+        return {
+            "published_at": datetime.utcnow(),
+            "country": self.country,
+        }

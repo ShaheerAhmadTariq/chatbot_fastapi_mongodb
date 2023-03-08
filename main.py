@@ -1,11 +1,13 @@
 # python -m uvicorn main:app --reload
 from fastapi import FastAPI, Request, Response, HTTPException, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
-from database import leads_collection, chats_collection, Leads, Chats
+from database import leads_collection, chats_collection, countries_collection, Leads, Chats, Countries
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from afterLogin import preparePrompt
 from userInfo import validateUserInfo
+from Country import addCountry, getAllCountries
+from chatbot import chatbot
 import openai
 import json
 import os
@@ -30,33 +32,23 @@ async def websocket_endpoint(websocket: WebSocket):
     while True:
         receivedData = await websocket.receive_text()
         receivedData = json.loads(receivedData)
-        # print(receivedData,"datatype", type(receivedData))
+        # print(receivedData,"datatype>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", type(receivedData))
         question = receivedData['prompt']
         email = receivedData['email']
-        with open('startupConversation.txt', 'r') as file:
-            file_contents = file.read()
-        global global_prompt
-        # print("global_prompt: ",global_prompt)
-        prompt = file_contents + global_prompt + question
-        # print(prompt)
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=prompt,
-            max_tokens=150,
-            n=1,
-            stop=None,
-            temperature=0.1,
-        )
-        response = response.choices[0].text.strip()
+        response =  chatbot(question)
+        # print("response ",response)
         chat_dict = {}
         chat_dict['prompt'] = question
         chat_dict['completion'] = response
-        global_prompt = global_prompt + "\nHuman: " + question + "\nAI: " + response
+        # global global_prompt
+        # global_prompt = global_prompt + "\nHuman: " + question + "\nAI: " + response
         lead = leads_collection.find_one({"email": email})
-        chat_dict['lead_id'] =str(lead['_id'])
-        chats_collection.insert_one(chat_dict)
-        await websocket.send_text(response) 
-
+        if lead:
+            chat_dict['lead_id'] =str(lead['_id'])
+            chats_collection.insert_one(chat_dict)
+            await websocket.send_text(response) 
+        else:
+            return {'error': "Invalid Email"}
 
 class leadSchema(BaseModel):
     name: str
@@ -87,7 +79,8 @@ class getChatsSchema(BaseModel):
 @app.post("/chats")
 async def get_chats(request: Request, user_string_request: getChatsSchema):
 # async def get_chats():
-    email = 'shaheerahmadtariq@gmail.com'
+    # email = 'shaheerahmadtariq@gmail.com'
+    email = user_string_request.email
     lead = leads_collection.find_one({"email": email})
     
     if lead is None:
@@ -118,6 +111,14 @@ def login(request: Request, user_request : UserloginRequest):
         if lead:
             global global_prompt
             global_prompt = global_prompt +  preparePrompt(lead)
-            return {"message": "Success"}
+            return {"message": "Success", "name": lead['name']}
         else:
             return {"status": "error", "message": "Invalid username or password"}
+
+
+class CountrySchema(BaseModel):
+    country : str
+@app.post('/addCountry')
+def insertCountry(request: Request, user_request: CountrySchema):
+    message = addCountry(user_request.country)
+    return {'message': message}

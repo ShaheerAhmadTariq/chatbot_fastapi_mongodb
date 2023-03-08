@@ -19,7 +19,8 @@ function ChatList(props) {
   // console.log(chats, "chats>>>>>>>>>>..")
   return (
     <div>
-      <h2>Chats for {props.name}</h2>
+      <a href={'https://calendly.com/shaheer-ahmad-1/test-meeting'} style={{ color: 'blue', textDecoration: 'underline' }}>Link for meeting</a>
+      <h2>Chats for <b style={{ color: 'grey', fontSize: '28px', fontWeight: 'bold' }}>{props.name}</b></h2>
       <ul>
         {chats?.map(chat => (
           <li key={chat._id} style={{ backgroundColor: '#f5f5f5', padding: '10px', marginBottom: '10px' }} >

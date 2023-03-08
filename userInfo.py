@@ -5,7 +5,7 @@ import requests
 import phonenumbers
 from dotenv import load_dotenv
 from phonenumbers import geocoder
-
+from Country import getAllCountries
 load_dotenv()
 openai.api_key = os.environ['API_KEY']
 SCAM_SEARCH_API_KEY = os.environ['SCAM_Search_API_KEY']
@@ -35,7 +35,7 @@ def is_valid_phoneNo(phoneNo):
     return pattern.match(phoneNo)
 
 def is_valid_country(country):
-    list_of_valid_countries = ['pakistan', 'america', 'canada', 'australia', 'uk', 'germany']
+    list_of_valid_countries = getAllCountries()
     if country.lower() in list_of_valid_countries:
         return True
     else:
@@ -70,15 +70,14 @@ def validateUserInfo(lead_dict):
         if is_valid_phoneNo(lead_dict['phoneNo']):
             if is_valid_country(lead_dict['country']):
                 if does_country_match_phone_code(lead_dict['phoneNo'], lead_dict['country']):
-
                     if is_valid_project(lead_dict['projectDetails']):
                         return "correct"
                     else:
-                        return "invalid project"
+                        return "Enter Valid project details"
                 else:
-                    return "invalid phone number or country"
+                    return "Phone Number does not match Country Code"
             else:
-                return "invalid country"
+                return "We don't yet provide services in your country"
         else:
             return "invalid phone Number"
     else:
